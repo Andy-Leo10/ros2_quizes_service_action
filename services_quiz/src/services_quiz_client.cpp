@@ -1,51 +1,72 @@
 #include "rclcpp/rclcpp.hpp"
 #include "services_quiz_srv/srv/spin.hpp"
 
-#include <chrono>
-#include <cstdlib>
 #include <memory>
-#include <iostream>
 
 using namespace std::chrono_literals;
 using Spin = services_quiz_srv::srv::Spin;
 
-int main(int argc, char **argv)
-{
-  rclcpp::init(argc, argv);
+class ServiceClient : public rclcpp::Node {
+private:
+  rclcpp::Client<Spin>::SharedPtr client_;
+  rclcpp::TimerBase::SharedPtr timer_;
+  bool service_done_ = false;
 
-  std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("client_rotating");
-  rclcpp::Client<Spin>::SharedPtr client =
-    node->create_client<Spin>("rotate");
-
-  while (!client->wait_for_service(1s)) {
-    if (!rclcpp::ok()) {
-      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
-      return 0;
+  void timer_callback() {
+    while (!client_->wait_for_service(1s)) {
+      if (!rclcpp::ok()) {
+        RCLCPP_ERROR(
+            this->get_logger(),
+            "Client interrupted while waiting for service. Terminating...");
+        return;
+      }
+      RCLCPP_INFO(this->get_logger(),
+                  "Service Unavailable. Waiting for Service...");
     }
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+
+    auto request = std::make_shared<Spin::Request>();
+    request->direction = "right";
+    request->angular_velocity = 0.2;
+    request->time = 10;
+
+    service_done_ = false;
+    auto result_future = client_->async_send_request(
+        request, std::bind(&ServiceClient::response_callback, this,
+                           std::placeholders::_1));
   }
 
-  auto request = std::make_shared<Spin::Request>();
-  request->direction = "right";
-  request->angular_velocity=0.2;
-  request->time=10;
+  void response_callback(rclcpp::Client<Spin>::SharedFuture future) {
+    auto status = future.wait_for(1s);
+    if (status == std::future_status::ready) {
+      auto result =
+          future.get(); // Obtiene el resultado de la operación asincrónica
+      if (result->success) {
+        RCLCPP_INFO(this->get_logger(), "Service returned true");
+      } else {
+        RCLCPP_INFO(this->get_logger(), "Service returned false");
+      }
+      service_done_ = true;
+    } else {
+      RCLCPP_INFO(this->get_logger(), "Service In-Progress...");
+    }
+  }
 
-  auto result_future = client->async_send_request(request);
-  // Wait for the result.
-  if (rclcpp::spin_until_future_complete(node, result_future) ==
-    rclcpp::FutureReturnCode::SUCCESS)
-  {
-    auto result = result_future.get();
-    if (result->success == true)
-    {
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Service returned success");
-    }
-    else if (result->success == false)
-    {
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Service returned false");
-    }
-  } else {
-    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service /moving");
+public:
+  ServiceClient() : Node("client_rotating") {
+    client_ = this->create_client<Spin>("rotate");
+    timer_ = this->create_wall_timer(
+        1s, std::bind(&ServiceClient::timer_callback, this));
+  }
+
+  bool is_service_done() const { return this->service_done_; }
+};
+
+int main(int argc, char **argv) {
+  rclcpp::init(argc, argv);
+
+  auto service_client = std::make_shared<ServiceClient>();
+  while (!service_client->is_service_done()) {
+    rclcpp::spin_some(service_client);
   }
 
   rclcpp::shutdown();
