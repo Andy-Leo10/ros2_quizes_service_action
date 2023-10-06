@@ -18,7 +18,7 @@ public:
         "rotate", std::bind(&ServerNode::moving_callback, this, _1, _2));
     publisher_ =
         this->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
-    is_busy_ = false;
+    bool is_busy_ = false;
   }
 
 private:
@@ -28,19 +28,9 @@ private:
   float angular_velocity_ = 0;
   int time_ = 0;
   bool success_ = false;
-  bool is_busy_ = false;
   void moving_callback(const std::shared_ptr<Spin::Request> request,
                        const std::shared_ptr<Spin::Response> response)
   {
-    if (is_busy_)
-    {
-      RCLCPP_ERROR(this->get_logger(), "Server is busy. Rejecting request.");
-      response->success = false;
-      return;
-    }
-
-    is_busy_ = true;
-
     auto message = geometry_msgs::msg::Twist();
     direction_ = request->direction;
     angular_velocity_ = request->angular_velocity;
@@ -77,8 +67,6 @@ private:
     response->success = success_;
     // finish message and then blank line
     RCLCPP_INFO(this->get_logger(), "Service finished \n");
-
-    is_busy_ = false;
   }
   void stop()
   {

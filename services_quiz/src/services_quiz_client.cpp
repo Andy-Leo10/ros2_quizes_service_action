@@ -15,17 +15,10 @@ private:
 
   void timer_callback()
   {
-    while (!client_->wait_for_service(1s))
+    if (!client_->wait_for_service(1s))
     {
-      if (!rclcpp::ok())
-      {
-        RCLCPP_ERROR(
-            this->get_logger(),
-            "Client interrupted while waiting for service. Terminating...");
-        return;
-      }
-      RCLCPP_INFO(this->get_logger(),
-                  "Service Unavailable. Waiting for Service...");
+      RCLCPP_ERROR(this->get_logger(), "Service Unavailable. Terminating...");
+      return;
     }
 
     auto request = std::make_shared<Spin::Request>();
@@ -37,6 +30,7 @@ private:
     auto result_future = client_->async_send_request(
         request, std::bind(&ServiceClient::response_callback, this,
                            std::placeholders::_1));
+    timer_->cancel();
   }
 
   void response_callback(rclcpp::Client<Spin>::SharedFuture future)
@@ -55,7 +49,7 @@ private:
         RCLCPP_INFO(this->get_logger(), "Service returned false");
       }
       service_done_ = true;
-      //cancel the timer after the service call is finished
+      // cancel the timer after the service call is finished
     }
     else
     {
