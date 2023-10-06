@@ -42,7 +42,6 @@ private:
   void response_callback(rclcpp::Client<Spin>::SharedFuture future)
   {
     RCLCPP_INFO(this->get_logger(), "Service Response Received !!!");
-    std::cout << "Service Response Received !!!" << std::endl;
     auto status = future.wait_for(1s);
     if (status == std::future_status::ready)
     {
@@ -62,6 +61,7 @@ private:
     {
       RCLCPP_ERROR(this->get_logger(), "Service call failed to finish properly");
     }
+    // give a look of this
     timer_->cancel();
   }
 
