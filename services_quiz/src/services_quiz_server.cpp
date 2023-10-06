@@ -30,7 +30,6 @@ private:
   void moving_callback(const std::shared_ptr<Spin::Request> request,
                        const std::shared_ptr<Spin::Response> response)
   {
-
     auto message = geometry_msgs::msg::Twist();
     direction_ = request->direction;
     angular_velocity_ = request->angular_velocity;
@@ -65,7 +64,7 @@ private:
     }
     stop();
     response->success = success_;
-    // finish message and then blank line 
+    // finish message and then blank line
     RCLCPP_INFO(this->get_logger(), "Service finished \n");
   }
   void stop()
