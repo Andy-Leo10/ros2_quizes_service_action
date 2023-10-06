@@ -62,6 +62,7 @@ private:
     else
     {
       RCLCPP_INFO(this->get_logger(), "Service In-Progress...");
+      std::cout<<"Service Done = FALSE = in PROGRESS"<<std::endl;
     }
   }
 
