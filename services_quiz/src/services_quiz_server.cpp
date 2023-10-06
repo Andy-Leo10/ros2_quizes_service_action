@@ -37,7 +37,7 @@ private:
     time_ = request->time;
     rclcpp::Rate loop_rate(1);
 
-    for (int i = 0; rclcpp::ok(i < time_) && (); i++)
+    for (int i = 0; rclcpp::ok() && (i < time_); i++)
     {
       if (direction_ == "right")
       {
@@ -55,15 +55,21 @@ private:
       }
       else
       {
-        message.linear.x = 0.0;
-        message.angular.z = 0;
-        publisher_->publish(message);
+        stop();
         success_ = false;
         break;
       }
       loop_rate.sleep();
     }
     response->success = success_;
+    stop();
+  }
+  void stop()
+  {
+    auto message = geometry_msgs::msg::Twist();
+    message.linear.x = 0.0;
+    message.angular.z = 0;
+    publisher_->publish(message);
   }
 };
 
