@@ -59,10 +59,12 @@ private:
         success_ = false;
         break;
       }
+      // print seconds passed
+      RCLCPP_INFO(this->get_logger(), "Seconds passed: %d", i + 1);
       loop_rate.sleep();
     }
-    response->success = success_;
     stop();
+    response->success = success_;
   }
   void stop()
   {

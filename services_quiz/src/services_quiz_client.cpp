@@ -6,15 +6,19 @@
 using namespace std::chrono_literals;
 using Spin = services_quiz_srv::srv::Spin;
 
-class ServiceClient : public rclcpp::Node {
+class ServiceClient : public rclcpp::Node
+{
 private:
   rclcpp::Client<Spin>::SharedPtr client_;
   rclcpp::TimerBase::SharedPtr timer_;
   bool service_done_ = false;
 
-  void timer_callback() {
-    while (!client_->wait_for_service(1s)) {
-      if (!rclcpp::ok()) {
+  void timer_callback()
+  {
+    while (!client_->wait_for_service(1s))
+    {
+      if (!rclcpp::ok())
+      {
         RCLCPP_ERROR(
             this->get_logger(),
             "Client interrupted while waiting for service. Terminating...");
@@ -35,24 +39,31 @@ private:
                            std::placeholders::_1));
   }
 
-  void response_callback(rclcpp::Client<Spin>::SharedFuture future) {
+  void response_callback(rclcpp::Client<Spin>::SharedFuture future)
+  {
     auto status = future.wait_for(1s);
-    if (status == std::future_status::ready) {
-      auto result =
-          future.get(); // Obtiene el resultado de la operación asincrónica
-      if (result->success) {
+    if (status == std::future_status::ready)
+    {
+      auto result =future.get(); // obtain the result of the service call
+      if (result->success)
+      {
         RCLCPP_INFO(this->get_logger(), "Service returned true");
-      } else {
+      }
+      else
+      {
         RCLCPP_INFO(this->get_logger(), "Service returned false");
       }
       service_done_ = true;
-    } else {
+    }
+    else
+    {
       RCLCPP_INFO(this->get_logger(), "Service In-Progress...");
     }
   }
 
 public:
-  ServiceClient() : Node("client_rotating") {
+  ServiceClient() : Node("client_rotating")
+  {
     client_ = this->create_client<Spin>("rotate");
     timer_ = this->create_wall_timer(
         1s, std::bind(&ServiceClient::timer_callback, this));
@@ -61,11 +72,13 @@ public:
   bool is_service_done() const { return this->service_done_; }
 };
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   rclcpp::init(argc, argv);
 
   auto service_client = std::make_shared<ServiceClient>();
-  while (!service_client->is_service_done()) {
+  while (!service_client->is_service_done())
+  {
     rclcpp::spin_some(service_client);
   }
 
