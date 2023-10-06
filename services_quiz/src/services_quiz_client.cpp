@@ -42,6 +42,7 @@ private:
   void response_callback(rclcpp::Client<Spin>::SharedFuture future)
   {
     auto status = future.wait_for(1s);
+    std::cout<<"status = "<<static_cast<int>(status)<<std::endl;
     if (status == std::future_status::ready)
     {
       auto result =future.get(); // obtain the result of the service call
