@@ -34,9 +34,11 @@ private:
     request->time = 10;
 
     service_done_ = false;
-    auto result_future = client_->async_send_request(
-        request, std::bind(&ServiceClient::response_callback, this,
-                           std::placeholders::_1));
+    // auto result_future = client_->async_send_request(
+    //     request, std::bind(&ServiceClient::response_callback, this,
+    //                        std::placeholders::_1));
+    auto result_future = client_->async_send_request(request, [this](rclcpp::Client<Spin>::SharedFuture future)
+                                                     { this->response_callback(std::move(future)); });
   }
 
   void response_callback(rclcpp::Client<Spin>::SharedFuture future)
@@ -44,7 +46,7 @@ private:
     auto status = future.wait_for(1s);
     if (status == std::future_status::ready)
     {
-      auto result =future.get(); // obtain the result of the service call
+      auto result = future.get(); // obtain the result of the service call
       if (result->success)
       {
         RCLCPP_INFO(this->get_logger(), "Service returned true");

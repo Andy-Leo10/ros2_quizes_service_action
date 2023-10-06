@@ -65,6 +65,8 @@ private:
     }
     stop();
     response->success = success_;
+    // finish message and then blank line 
+    RCLCPP_INFO(this->get_logger(), "Service finished \n");
   }
   void stop()
   {
