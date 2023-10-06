@@ -14,6 +14,7 @@ find_package(nav_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(actions_quiz_msg REQUIRED)
+find_package(rclcpp_action REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -28,3 +29,20 @@ if(BUILD_TESTING)
 endif()
 
 ament_package()
+#ANDY-LEO
+add_executable(actions_quiz_server_node src/actions_quiz_server.cpp)
+ament_target_dependencies(actions_quiz_server_node rclcpp std_msgs geometry_msgs nav_msgs sensor_msgs tf2 actions_quiz_msg rclcpp_action)
+add_executable(actions_quiz_client_node src/actions_quiz_client.cpp)
+ament_target_dependencies(actions_quiz_client_node rclcpp std_msgs geometry_msgs nav_msgs sensor_msgs tf2 actions_quiz_msg rclcpp_action)
+
+install(TARGETS
+   actions_quiz_server_node
+   actions_quiz_client_node
+   DESTINATION lib/${PROJECT_NAME}
+ )
+
+# Install launch files.
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}/
+)
