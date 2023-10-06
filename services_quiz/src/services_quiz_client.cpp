@@ -40,11 +40,6 @@ private:
     auto result_future = client_->async_send_request(
         request, std::bind(&ServiceClient::response_callback, this,
                            std::placeholders::_1));
-    while (!service_done_)
-    {
-      RCLCPP_INFO(this->get_logger(), "Service working...");
-      std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
   }
 
   void response_callback(rclcpp::Client<Spin>::SharedFuture future)
@@ -91,6 +86,7 @@ int main(int argc, char **argv)
                                    RCUTILS_LOG_SEVERITY_DEBUG); // set logger level to debug
   while (!service_client->is_service_done())
   {
+    RCLCPP_INFO(this->get_logger(), "Service working...");
     rclcpp::spin_some(service_client);
   }
 
