@@ -31,7 +31,7 @@ private:
     auto request = std::make_shared<Spin::Request>();
     request->direction = "right";
     request->angular_velocity = 0.2;
-    request->time = 10;
+    request->time = 2;
 
     service_done_ = false;
     auto result_future = client_->async_send_request(
