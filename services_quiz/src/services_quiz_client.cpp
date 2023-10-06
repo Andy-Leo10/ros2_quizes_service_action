@@ -85,7 +85,7 @@ int main(int argc, char **argv)
                                    RCUTILS_LOG_SEVERITY_DEBUG); // set logger level to debug
   while (!service_client->is_service_done())
   {
-    RCLCPP_INFO(this->get_logger(), "Service working...");
+    RCLCPP_INFO(service_client->get_logger(), "Service working...");
     rclcpp::spin_some(service_client);
   }
 
