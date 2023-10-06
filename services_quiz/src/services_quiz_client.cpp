@@ -41,33 +41,24 @@ private:
 
   void response_callback(rclcpp::Client<Spin>::SharedFuture future)
   {
+    RCLCPP_INFO(this->get_logger(), "Service Response Received !!!");
     auto status = future.wait_for(1s);
-    std::cout<<"status CURRENT= "<<static_cast<int>(status)<<std::endl;
     if (status == std::future_status::ready)
     {
       auto result =future.get(); // obtain the result of the service call
       if (result->success)
       {
-        RCLCPP_INFO(this->get_logger(), "Service returned true");
+        RCLCPP_INFO(this->get_logger(), "Service returned true !!!");
       }
       else
       {
         RCLCPP_INFO(this->get_logger(), "Service returned false");
       }
       service_done_ = true;
-      std::cout<<"Service Done = TRUE"<<std::endl;
-      std::cout<<"result->success = "<<result->success<<std::endl;
-      std::cout<<"status = "<<static_cast<int>(status)<<std::endl;
-    }
-    else if (status == std::future_status::timeout)
-    {
-      RCLCPP_INFO(this->get_logger(), "Service call timed out");
-      std::cout<<"Service Done = FALSE = TIMEOUT"<<std::endl;
     }
     else
     {
       RCLCPP_INFO(this->get_logger(), "Service In-Progress...");
-      std::cout<<"Service Done = FALSE = in PROGRESS"<<std::endl;
     }
   }
 
