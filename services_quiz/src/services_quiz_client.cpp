@@ -54,6 +54,7 @@ private:
         RCLCPP_INFO(this->get_logger(), "Service returned false");
       }
       service_done_ = true;
+      std::cout<<"Service Done = TRUE"<<std::endl;
     }
     else
     {
