@@ -31,7 +31,7 @@ private:
     auto request = std::make_shared<Spin::Request>();
     request->direction = "right";
     request->angular_velocity = 0.2;
-    request->time = 2;
+    request->time = 10;
 
     service_done_ = false;
     auto result_future = client_->async_send_request(
@@ -42,7 +42,7 @@ private:
   void response_callback(rclcpp::Client<Spin>::SharedFuture future)
   {
     auto status = future.wait_for(1s);
-    std::cout<<"status = "<<static_cast<int>(status)<<std::endl;
+    std::cout<<"status CURRENT= "<<static_cast<int>(status)<<std::endl;
     if (status == std::future_status::ready)
     {
       auto result =future.get(); // obtain the result of the service call
