@@ -30,6 +30,7 @@ private:
     auto result_future = client_->async_send_request(
         request, std::bind(&ServiceClient::response_callback, this,
                            std::placeholders::_1));
+    //necessary cancel
     timer_->cancel();
   }
 
@@ -42,20 +43,19 @@ private:
       auto result = future.get(); // obtain the result of the service call
       if (result->success)
       {
-        RCLCPP_INFO(this->get_logger(), "Service returned true !!!");
+        RCLCPP_INFO(this->get_logger(), "result->success = true !!!");
       }
       else
       {
-        RCLCPP_INFO(this->get_logger(), "Service returned false");
+        RCLCPP_INFO(this->get_logger(), "result->success = false");
       }
       service_done_ = true;
-      // cancel the timer after the service call is finished
     }
     else
     {
       RCLCPP_ERROR(this->get_logger(), "Service call failed to finish properly");
     }
-    // give a look of this
+    // only for assurance 
     timer_->cancel();
   }
 
