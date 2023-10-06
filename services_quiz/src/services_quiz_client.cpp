@@ -59,6 +59,11 @@ private:
       std::cout<<"result->success = "<<result->success<<std::endl;
       std::cout<<"status = "<<static_cast<int>(status)<<std::endl;
     }
+    else if (status == std::future_status::timeout)
+    {
+      RCLCPP_INFO(this->get_logger(), "Service call timed out");
+      std::cout<<"Service Done = FALSE = TIMEOUT"<<std::endl;
+    }
     else
     {
       RCLCPP_INFO(this->get_logger(), "Service In-Progress...");
