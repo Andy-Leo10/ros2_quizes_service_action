@@ -66,7 +66,6 @@ public:
   ServiceClient() : Node("client_rotating")
   {
     client_ = this->create_client<Spin>("rotate");
-    this->set_logger_level(rclcpp::logging::LoggerLevel::DEBUG); // set logger level to debug
     timer_ = this->create_wall_timer(
         1s, std::bind(&ServiceClient::timer_callback, this));
   }
@@ -79,6 +78,8 @@ int main(int argc, char **argv)
   rclcpp::init(argc, argv);
 
   auto service_client = std::make_shared<ServiceClient>();
+  rcutils_logging_set_logger_level(service_client->get_logger().get_name(),
+                                   RCUTILS_LOG_SEVERITY_DEBUG); // set logger level to debug
   while (!service_client->is_service_done())
   {
     rclcpp::spin_some(service_client);
