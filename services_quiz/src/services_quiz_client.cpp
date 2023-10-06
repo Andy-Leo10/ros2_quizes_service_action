@@ -56,7 +56,7 @@ private:
       service_done_ = true;
       std::cout<<"Service Done = TRUE"<<std::endl;
       std::cout<<"result->success = "<<result->success<<std::endl;
-      std::cout<<"status = "<<status<<std::endl;
+      std::cout<<"status = "<<static_cast<int>(status)<<std::endl;
     }
     else
     {
