@@ -18,7 +18,7 @@ public:
         "rotate", std::bind(&ServerNode::moving_callback, this, _1, _2));
     publisher_ =
         this->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
-    bool is_busy_ = false;
+    is_busy_ = false;
   }
 
 private:
@@ -28,6 +28,7 @@ private:
   float angular_velocity_ = 0;
   int time_ = 0;
   bool success_ = false;
+  bool is_busy_ = false;
   void moving_callback(const std::shared_ptr<Spin::Request> request,
                        const std::shared_ptr<Spin::Response> response)
   {
