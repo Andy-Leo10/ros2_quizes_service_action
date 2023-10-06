@@ -28,13 +28,10 @@ private:
                   "Service Unavailable. Waiting for Service...");
     }
 
-    // cancel the timer
-    timer_->cancel();
-
     auto request = std::make_shared<Spin::Request>();
     request->direction = "right";
     request->angular_velocity = 0.2;
-    request->time = 10;
+    request->time = 2;
 
     service_done_ = false;
     auto result_future = client_->async_send_request(
@@ -59,6 +56,8 @@ private:
         RCLCPP_INFO(this->get_logger(), "Service returned false");
       }
       service_done_ = true;
+      //cancel the timer after the service call is finished
+      timer_->cancel();
     }
     else
     {
