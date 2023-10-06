@@ -28,6 +28,9 @@ private:
                   "Service Unavailable. Waiting for Service...");
     }
 
+    // cancel the timer
+    timer_->cancel();
+
     auto request = std::make_shared<Spin::Request>();
     request->direction = "right";
     request->angular_velocity = 0.2;
@@ -37,15 +40,21 @@ private:
     auto result_future = client_->async_send_request(
         request, std::bind(&ServiceClient::response_callback, this,
                            std::placeholders::_1));
+    while (!service_done_)
+    {
+      RCLCPP_INFO(this->get_logger(), "Service working...");
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
   }
 
   void response_callback(rclcpp::Client<Spin>::SharedFuture future)
   {
     RCLCPP_INFO(this->get_logger(), "Service Response Received !!!");
+    std::cout << "Service Response Received !!!" << std::endl;
     auto status = future.wait_for(1s);
     if (status == std::future_status::ready)
     {
-      auto result =future.get(); // obtain the result of the service call
+      auto result = future.get(); // obtain the result of the service call
       if (result->success)
       {
         RCLCPP_INFO(this->get_logger(), "Service returned true !!!");
@@ -58,7 +67,7 @@ private:
     }
     else
     {
-      RCLCPP_INFO(this->get_logger(), "Service In-Progress...");
+      RCLCPP_ERROR(this->get_logger(), "Service call failed to finish properly");
     }
   }
 
