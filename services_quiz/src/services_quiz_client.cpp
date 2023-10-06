@@ -57,12 +57,12 @@ private:
       }
       service_done_ = true;
       //cancel the timer after the service call is finished
-      timer_->cancel();
     }
     else
     {
       RCLCPP_ERROR(this->get_logger(), "Service call failed to finish properly");
     }
+    timer_->cancel();
   }
 
 public:
@@ -86,6 +86,7 @@ int main(int argc, char **argv)
   while (!service_client->is_service_done())
   {
     RCLCPP_INFO(service_client->get_logger(), "Service working...");
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     rclcpp::spin_some(service_client);
   }
 
