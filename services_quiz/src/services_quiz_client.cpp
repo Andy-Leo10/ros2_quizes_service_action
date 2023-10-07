@@ -13,7 +13,7 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
   bool service_done_ = false;
 
-  void timer_callback()
+  void timer_callback(const std::string& direction, float angular_velocity, int time)
   {
     if (!client_->wait_for_service(1s))
     {
@@ -22,9 +22,9 @@ private:
     }
 
     auto request = std::make_shared<Spin::Request>();
-    request->direction = "right";
-    request->angular_velocity = 0.2;
-    request->time = 2;
+    request->direction = direction;
+    request->angular_velocity = angular_velocity;
+    request->time = time;
 
     service_done_ = false;
     auto result_future = client_->async_send_request(
@@ -60,12 +60,14 @@ private:
   }
 
 public:
-  ServiceClient() : Node("client_rotating")
-  {
-    client_ = this->create_client<Spin>("rotate");
+  ServiceClient(const std::string& service_name, const std::string& direction, float angular_velocity, int time) : Node("client_rotating")
+    {
+    client_ = this->create_client<Spin>(service_name);
     timer_ = this->create_wall_timer(
-        1s, std::bind(&ServiceClient::timer_callback, this));
-  }
+        1s, [this, direction, angular_velocity, time]() {
+            timer_callback(direction, angular_velocity, time);
+        });
+    }
 
   bool is_service_done() const { return this->service_done_; }
 };
@@ -74,14 +76,27 @@ int main(int argc, char **argv)
 {
   rclcpp::init(argc, argv);
 
-  auto service_client = std::make_shared<ServiceClient>();
-  rcutils_logging_set_logger_level(service_client->get_logger().get_name(),
+  auto service_client1 = std::make_shared<ServiceClient>("rotate", "right", 0.2, 2);
+  rcutils_logging_set_logger_level(service_client1->get_logger().get_name(),
                                    RCUTILS_LOG_SEVERITY_DEBUG); // set logger level to debug
-  while (!service_client->is_service_done())
+  while (!service_client1->is_service_done())
   {
-    RCLCPP_INFO(service_client->get_logger(), "Service working...");
+    RCLCPP_INFO(service_client1->get_logger(), "Service1 working...");
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    rclcpp::spin_some(service_client);
+    rclcpp::spin_some(service_client1);
+  }
+
+    // delete the service client
+  service_client1.reset();
+
+  auto service_client2 = std::make_shared<ServiceClient>("rotate", "left", 0.5, 3);
+  rcutils_logging_set_logger_level(service_client2->get_logger().get_name(),
+                                   RCUTILS_LOG_SEVERITY_DEBUG); // set logger level to debug
+  while (!service_client2->is_service_done())
+  {
+    RCLCPP_INFO(service_client2->get_logger(), "Service2 working...");
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    rclcpp::spin_some(service_client2);
   }
 
   rclcpp::shutdown();
