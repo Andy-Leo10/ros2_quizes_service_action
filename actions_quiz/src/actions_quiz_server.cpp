@@ -41,9 +41,9 @@ private:
   //definition of odom subscriber & definition of tracking distance variables
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
   double distance_;
-  nav_msgs::msgs::Odometry prev_pose_;
+  nav_msgs::msg::Odometry prev_pose_;
 
-  void odomCallback(const nav_msgs::msgs::Odometry::ConstPtr &msg)
+  void odomCallback(const nav_msgs::msg::Odometry::ConstPtr &msg)
   {
     // calculate distance traveled using Euclidean distance formula
     double dx = msg->pose.pose.position.x - prev_pose_.position.x;
