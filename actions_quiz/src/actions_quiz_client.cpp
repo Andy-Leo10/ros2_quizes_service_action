@@ -111,7 +111,7 @@ private:
     }
 
     RCLCPP_INFO(this->get_logger(), "Result1 received: %s", result.result->status ? "true" : "false");
-    RCLCPP_INFO(this->get_logger(), "Result1 received: %f", result.result->total_dist);
+    RCLCPP_INFO(this->get_logger(), "Result2 received: %f", result.result->total_dist);
   }
 };  // class MyActionClient
 
