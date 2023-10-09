@@ -130,13 +130,13 @@ private:
 int main(int argc, char **argv)
 {
   rclcpp::init(argc, argv);
-
   auto action_server = std::make_shared<MyActionServer>();
-
+  rcutils_logging_set_logger_level(action_server->get_logger().get_name(), RCUTILS_LOG_SEVERITY_DEBUG);
+  RCLCPP_INFO(action_server->get_logger(), "ACTION = /distance_as READY!");
+  RCLCPP_INFO(action_server->get_logger(), "FOR TEST USE = ros2 action send_goal -f /distance_as actions_quiz_msg/action/Distance \"{seconds: 2}\"");
   rclcpp::executors::MultiThreadedExecutor executor;
   executor.add_node(action_server);
   executor.spin();
-
   rclcpp::shutdown();
   return 0;
 }
