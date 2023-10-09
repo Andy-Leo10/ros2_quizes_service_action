@@ -122,7 +122,7 @@ private:
       result->total_dist = tracking_distance_FB;
       result->status = true;
       goal_handle->succeed(result);
-      RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+      RCLCPP_INFO(this->get_logger(), "Goal succeeded \n");
     }
   }
 }; // class MyActionServer

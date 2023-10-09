@@ -14,7 +14,7 @@ public:
   using Distance = actions_quiz_msg::action::Distance;
   using GoalHandleDistance = rclcpp_action::ClientGoalHandle<Distance>;
 
-  explicit MyActionClient(const rclcpp::NodeOptions & node_options = rclcpp::NodeOptions())
+  explicit MyActionClient(const std::string& service_name, int seconds,const rclcpp::NodeOptions & node_options = rclcpp::NodeOptions())
   : Node("my_distance_client", node_options), goal_done_(false)
   {
     this->client_ptr_ = rclcpp_action::create_client<Distance>(
@@ -22,8 +22,9 @@ public:
       this->get_node_graph_interface(),
       this->get_node_logging_interface(),
       this->get_node_waitables_interface(),
-      "distance_as");
+      service_name);
 
+    this->goal_=seconds;
     this->timer_ = this->create_wall_timer(
       std::chrono::milliseconds(500),
       std::bind(&MyActionClient::send_goal, this));
@@ -53,7 +54,7 @@ public:
     }
 
     auto goal_msg = Distance::Goal();
-    goal_msg.seconds = 20;
+    goal_msg.seconds = this->goal_;
 
     RCLCPP_INFO(this->get_logger(), "Sending goal");
 
@@ -75,6 +76,7 @@ private:
   rclcpp_action::Client<Distance>::SharedPtr client_ptr_;
   rclcpp::TimerBase::SharedPtr timer_;
   bool goal_done_;
+  int goal_;
 
   void goal_response_callback(const GoalHandleDistance::SharedPtr & goal_handle)
   {
@@ -118,12 +120,14 @@ private:
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
-  auto action_client = std::make_shared<MyActionClient>();
+  auto action_client1 = std::make_shared<MyActionClient>("distance_as", 5);
+  auto action_client2 = std::make_shared<MyActionClient>("distance_as", 10);
     
   rclcpp::executors::MultiThreadedExecutor executor;
-  executor.add_node(action_client);
+  executor.add_node(action_client1);
+  executor.add_node(action_client2);
 
-  while (!action_client->is_goal_done()) {
+  while (!action_client1->is_goal_done() || !action_client2->is_goal_done()) {
     executor.spin();
   }
 
