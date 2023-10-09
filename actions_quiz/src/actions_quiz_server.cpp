@@ -46,9 +46,9 @@ private:
   void odomCallback(const nav_msgs::msg::Odometry::ConstPtr &msg)
   {
     // calculate distance traveled using Euclidean distance formula
-    double dx = msg->pose.pose.position.x - prev_pose_.position.x;
-    double dy = msg->pose.pose.position.y - prev_pose_.position.y;
-    double dz = msg->pose.pose.position.z - prev_pose_.position.z;
+    double dx = msg->pose.pose.position.x - prev_pose_.pose.pose.position.x;
+    double dy = msg->pose.pose.position.y - prev_pose_.pose.pose.position.y;
+    double dz = msg->pose.pose.position.z - prev_pose_.pose.pose.position.z;
     double distance = sqrt(dx * dx + dy * dy + dz * dz);
 
     // add distance traveled to total distance
