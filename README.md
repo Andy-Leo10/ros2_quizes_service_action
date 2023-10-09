@@ -24,3 +24,8 @@ ros2 launch actions_quiz actions_quiz_server.launch.py
 ros2 action send_goal -f /distance_as actions_quiz_msg/action/Distance "{seconds: 2}"
 ros2 launch actions_quiz actions_quiz_client.launch.py
 ```
+
+## for test run
+```
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+```
