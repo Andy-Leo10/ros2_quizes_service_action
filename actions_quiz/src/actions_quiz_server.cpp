@@ -55,7 +55,7 @@ private:
     distance_ += distance;
 
     // update previous pose
-    prev_pose_.pose = msg->pose.pose;
+    prev_pose_.pose = msg->pose;
   }
 
   rclcpp_action::GoalResponse handle_goal(
