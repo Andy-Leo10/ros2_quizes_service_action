@@ -43,7 +43,7 @@ private:
   double distance_;
   nav_msgs::msg::Odometry prev_pose_;
 
-  void odomCallback(const nav_msgs::msg::Odometry::ConstPtr &msg)
+  void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg)
   {
     // calculate distance traveled using Euclidean distance formula
     double dx = msg->pose.pose.position.x - prev_pose_.pose.pose.position.x;
